@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Traffic Light Control</title>
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      * {
+        font-family: Geneva, Tahoma, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: white;
+      }
+
+      h1 {
+        color: black;
+        font-size: 5em;
+      }
+      h2 {
+        color: black;
+      }
+      #radios {
+        font-size: 2em;
+      }
+
+      #LEDStateText {
+        font-size: 2em;
+      }
+    </style>
+  </head>
+  <body>
+    <center><h1>Traffic Light Toggler</h1></center>
+
+    <!-- The below radio buttons when selected run 4 functions to turn off all other LEDs, display the selected radio button text and turn on the correct LED -->
+    <center>
+      <div id="middle">
+        <form id="radios" action="">
+          <input
+            type="radio"
+            name="trafficControl"
+            onclick="displayRadioValue();turnLEDOn();turnYellowLEDOff();turnGreenLEDOff();"
+            value="Red"
+          />
+          Red<br />
+          <input
+            type="radio"
+            name="trafficControl"
+            onclick="displayRadioValue();turnYellowLEDOn();turnLEDOff();turnGreenLEDOff()"
+            value="Amber"
+          />
+          Amber<br />
+          <input
+            type="radio"
+            name="trafficControl"
+            onclick="displayRadioValue();turnGreenLEDOn();turnYellowLEDOff();turnLEDOff();"
+            value="Green"
+          />
+          Green
+        </form>
+
+        <br />
+        <div id="result"></div>
+
+        <hr />
+
+        <p id="LEDStateText">
+          Value Reported From Device:
+          <span id="LEDOnStatus">No Reading Yet</span>
+        </p>
+      </div>
+    </center>
+
+    <script type="text/javascript">
+      /* define vars */
+
+      var deviceID = "23002c000947373336323230";
+      var accessToken = "192ef342ae50ab0951e952d752a3c9c20e5abcf3";
+
+      var func2call = "led";
+      var func2callYellow = "ledYellow";
+      var func2callGreen = "ledGreen";
+      var var2get = "ledState";
+
+      /* Check for updates for the state of the traffic light from the device it's self*/
+
+      window.setInterval(getLEDState, 250);
+
+      /* Red Led functions */
+
+      function turnLEDOn() {
+        var requestURL =
+          "https://api.particle.io/v1/devices/" +
+          deviceID +
+          "/" +
+          func2call +
+          "/";
+        $.post(requestURL, { params: "on", access_token: accessToken });
+      }
+
+      function turnLEDOff() {
+        var requestURL =
+          "https://api.particle.io/v1/devices/" +
+          deviceID +
+          "/" +
+          func2call +
+          "/";
+        $.post(requestURL, { params: "off", access_token: accessToken });
+      }
+
+      /* Yellow Led functions */
+
+      function turnYellowLEDOn() {
+        var requestURL =
+          "https://api.particle.io/v1/devices/" +
+          deviceID +
+          "/" +
+          func2callYellow +
+          "/";
+        $.post(requestURL, { params: "on", access_token: accessToken });
+      }
+
+      function turnYellowLEDOff() {
+        var requestURL =
+          "https://api.particle.io/v1/devices/" +
+          deviceID +
+          "/" +
+          func2callYellow +
+          "/";
+        $.post(requestURL, { params: "off", access_token: accessToken });
+      }
+
+      /* Green Led functions */
+
+      function turnGreenLEDOn() {
+        var requestURL =
+          "https://api.particle.io/v1/devices/" +
+          deviceID +
+          "/" +
+          func2callGreen +
+          "/";
+        $.post(requestURL, { params: "on", access_token: accessToken });
+      }
+
+      function turnGreenLEDOff() {
+        var requestURL =
+          "https://api.particle.io/v1/devices/" +
+          deviceID +
+          "/" +
+          func2callGreen +
+          "/";
+        $.post(requestURL, { params: "off", access_token: accessToken });
+      }
+
+      /* Show the value of the radio buttons */
+
+      function displayRadioValue() {
+        var ele = document.getElementsByName("trafficControl");
+
+        for (i = 0; i < ele.length; i++) {
+          if (ele[i].checked)
+            document.getElementById("result").innerHTML =
+              "Traffic Control Selected: " + ele[i].value;
+        }
+      }
+      /* Function to get the state of the LED control reported from the particle */
+
+      function getLEDState() {
+        var requestURL =
+          "https://api.particle.io/v1/devices/" +
+          deviceID +
+          "/" +
+          var2get +
+          "/?access_token=" +
+          accessToken;
+        $.getJSON(requestURL, function (json) {
+          $("#LEDOnStatus").text(json.result);
+        });
+      }
+    </script>
+  </body>
+</html>
